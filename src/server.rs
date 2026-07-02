@@ -518,7 +518,7 @@ impl RaknetListener {
     /// listener.set_motd("Another Minecraft Server" , 999999 , "486" , "1.18.11", "Survival" , 19132).await;
     /// ```
     pub async fn set_motd(
-        &mut self,
+        &self,
         server_name: &str,
         max_connection: u32,
         mc_protocol_version: &str,
@@ -547,6 +547,10 @@ impl RaknetListener {
     /// ```
     pub async fn get_motd(&self) -> String {
         self.motd.read().await.clone()
+    }
+
+    pub fn motd_handle(&self) -> Arc<RwLock<String>> {
+        self.motd.clone()
     }
 
     /// Returns the socket address of the local half of this Raknet connection.
@@ -593,7 +597,7 @@ impl RaknetListener {
     /// let mut socket = RaknetListener::bind("127.0.0.1:19132".parse().unwrap()).await.unwrap();
     /// socket.set_full_motd("motd").await;
     /// ```
-    pub async fn set_full_motd(&mut self, motd: String) -> Result<()> {
+    pub async fn set_full_motd(&self, motd: String) -> Result<()> {
         let mut w = self.motd.write().await;
         *w = motd;
         Ok(())
