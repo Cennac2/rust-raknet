@@ -593,8 +593,9 @@ impl RaknetListener {
     /// let mut socket = RaknetListener::bind("127.0.0.1:19132".parse().unwrap()).await.unwrap();
     /// socket.set_full_motd("motd").await;
     /// ```
-    pub fn set_full_motd(&mut self, motd: String) -> Result<()> {
-        self.motd = Arc::new(RwLock::new(String::from(motd)));
+    pub async fn set_full_motd(&mut self, motd: String) -> Result<()> {
+        let mut w = self.motd.write().await;
+        *w = motd;
         Ok(())
     }
 
