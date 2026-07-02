@@ -102,6 +102,7 @@ pub struct ConnectedPing {
     pub client_timestamp: i64,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct PacketUnconnectedPing {
     pub time: i64,
@@ -109,6 +110,7 @@ pub struct PacketUnconnectedPing {
     pub guid: u64,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct PacketUnconnectedPong {
     pub time: i64,
@@ -117,12 +119,14 @@ pub struct PacketUnconnectedPong {
     pub motd: String,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct ConnectedPong {
     pub client_timestamp: i64,
     pub server_timestamp: i64,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct OpenConnectionRequest1 {
     pub magic: bool,
@@ -130,6 +134,7 @@ pub struct OpenConnectionRequest1 {
     pub mtu_size: u16,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct OpenConnectionRequest2 {
     pub magic: bool,
@@ -138,6 +143,7 @@ pub struct OpenConnectionRequest2 {
     pub guid: u64,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct OpenConnectionReply1 {
     pub magic: bool,
@@ -146,6 +152,7 @@ pub struct OpenConnectionReply1 {
     pub mtu_size: u16,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct OpenConnectionReply2 {
     pub magic: bool,
@@ -177,6 +184,7 @@ pub struct NewIncomingConnection {
     pub accepted_timestamp: i64,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct IncompatibleProtocolVersion {
     pub server_protocol: u8,
@@ -184,6 +192,7 @@ pub struct IncompatibleProtocolVersion {
     pub server_guid: u64,
 }
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct AlreadyConnected {
     pub magic: bool,

@@ -51,6 +51,7 @@ impl Reliability {
 const NEEDS_B_AND_AS_FLAG: u8 = 0x4;
 const CONTINUOUS_SEND_FLAG: u8 = 0x8;
 
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct FrameSetPacket {
     pub id: u8,
