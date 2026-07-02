@@ -3,7 +3,7 @@ use std::{net::SocketAddr, sync::Arc};
 use tokio::net::UdpSocket;
 use tokio::sync::mpsc::channel;
 use tokio::sync::mpsc::{Receiver, Sender};
-use tokio::sync::{Mutex, Notify};
+use tokio::sync::{Mutex, Notify, RwLock};
 
 use crate::error::{RaknetError, Result};
 use crate::packet::*;
@@ -17,7 +17,7 @@ type SessionSender = (i64, Sender<Vec<u8>>);
 
 /// Implementation of Raknet Server.
 pub struct RaknetListener {
-    motd: String,
+    motd: Arc<RwLock<String>>,
     socket: Option<Arc<UdpSocket>>,
     guid: u64,
     listened: bool,
@@ -50,7 +50,7 @@ impl RaknetListener {
         let (connection_sender, connection_receiver) = channel::<RaknetSocket>(10);
 
         let ret = Self {
-            motd: String::new(),
+            motd: Arc::new(RwLock::new(String::new())),
             socket: Some(Arc::new(s)),
             guid: rand::random(),
             listened: false,
@@ -88,7 +88,7 @@ impl RaknetListener {
         let (connection_sender, connection_receiver) = channel::<RaknetSocket>(10);
 
         let ret = Self {
-            motd: String::new(),
+            motd: Arc::new(RwLock::new(String::new())),
             socket: Some(Arc::new(s)),
             guid: rand::random(),
             listened: false,
@@ -208,23 +208,27 @@ impl RaknetListener {
             return;
         }
 
-        if self.motd.is_empty() {
-            self.set_motd(
-                SERVER_NAME,
-                MAX_CONNECTION,
-                "486",
-                "1.18.11",
-                "Survival",
-                self.socket.as_ref().unwrap().local_addr().unwrap().port(),
-            )
-            .await;
+        {
+            let current_motd = self.motd.clone();
+
+            if current_motd.read().await.is_empty() {
+                self.set_motd(
+                    SERVER_NAME,
+                    MAX_CONNECTION,
+                    "486",
+                    "1.18.11",
+                    "Survival",
+                    self.socket.as_ref().unwrap().local_addr().unwrap().port(),
+                )
+                .await;
+            }
         }
 
         let socket = self.socket.as_ref().unwrap().clone();
         let guid = self.guid;
         let sessions = self.sessions.clone();
         let connection_sender = self.connection_sender.clone();
-        let motd = self.get_motd().await;
+        let motd = self.motd.clone();
 
         self.listened = true;
 
@@ -242,7 +246,7 @@ impl RaknetListener {
             raknet_log_debug!("start listen worker : {}", local_addr);
 
             loop {
-                let motd = motd.clone();
+                let motd = motd.read().await.clone();
                 let size: usize;
                 let addr: SocketAddr;
 
@@ -522,7 +526,7 @@ impl RaknetListener {
         game_type: &str,
         port: u16,
     ) {
-        self.motd = format!(
+        *self.motd.write().await = format!(
             "MCPE;{};{};{};0;{};{};Bedrock level;{};1;{};",
             server_name,
             mc_protocol_version,
@@ -542,7 +546,7 @@ impl RaknetListener {
     /// let motd = listener.get_motd().await;
     /// ```
     pub async fn get_motd(&self) -> String {
-        self.motd.clone()
+        self.motd.read().await.clone()
     }
 
     /// Returns the socket address of the local half of this Raknet connection.
@@ -590,7 +594,7 @@ impl RaknetListener {
     /// socket.set_full_motd("motd").await;
     /// ```
     pub fn set_full_motd(&mut self, motd: String) -> Result<()> {
-        self.motd = motd;
+        self.motd = Arc::new(RwLock::new(String::from(motd)));
         Ok(())
     }
 
