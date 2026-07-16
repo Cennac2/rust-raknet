@@ -67,6 +67,10 @@ impl RaknetListener {
         Ok(ret)
     }
 
+    pub fn get_guid(&self) -> u64 {
+        self.guid
+    }
+
     /// Creates a new RaknetListener from a UdpSocket.
     ///
     /// # Example
