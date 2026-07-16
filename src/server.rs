@@ -214,6 +214,7 @@ impl RaknetListener {
             if current_motd.read().await.is_empty() {
                 self.set_motd(
                     SERVER_NAME,
+                    "Bedrock level",
                     MAX_CONNECTION,
                     "486",
                     "1.18.11",
@@ -520,6 +521,7 @@ impl RaknetListener {
     pub async fn set_motd(
         &self,
         server_name: &str,
+        world_name: &str,
         max_connection: u32,
         mc_protocol_version: &str,
         mc_version: &str,
@@ -527,12 +529,13 @@ impl RaknetListener {
         port: u16,
     ) {
         *self.motd.write().await = format!(
-            "MCPE;{};{};{};0;{};{};Bedrock level;{};1;{};",
+            "MCPE;{};{};{};0;{};{};{};{};1;{};",
             server_name,
             mc_protocol_version,
             mc_version,
             max_connection,
             self.guid,
+            world_name,
             game_type,
             port
         );
